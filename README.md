@@ -17,7 +17,7 @@ npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. The API runs at **http://localhost:4000**; [the health endpoint](http://localhost:4000/api/health) reports whether it is ready and which database mode is active.
+Open **http://localhost:5173**. The API runs at **http://localhost:4000**; [the health endpoint](http://localhost:4000/api/health) reports whether it is ready and which database mode is active. Vite proxies local API, image, and Socket.io requests to the server.
 
 With no `MONGO_URI`, ShareBite starts an in-memory MongoDB and seeds the demo automatically. The server logs this mode clearly. **Memory-mode data resets when the server stops.** The first start downloads the MongoDB binary (about 70 MB); later starts reuse the cached copy.
 
@@ -79,15 +79,56 @@ The app works without an `.env` file. To change its settings, copy `.env.example
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `MONGO_URI` | Empty | Persistent MongoDB connection. If missing or unreachable, ShareBite falls back to a seeded in-memory database. |
+| `MONGO_URI` | Empty | Persistent MongoDB connection. Required in production; development falls back to memory if it is missing or unreachable. |
 | `JWT_SECRET` | Generated on startup in development | Signing secret for login tokens. **Required** when `NODE_ENV=production`. |
 | `PORT` | `4000` | Express API and Socket.io port. |
-| `CLIENT_ORIGIN` | `http://localhost:5173` | Allowed browser origin for the API and sockets. |
+| `CLIENT_URL` | Vercel production domain plus local origins | Comma-separated allowed browser origins for the API and Socket.io. |
+| `NODE_ENV` | Development | Set `production` on Render. Production requires MongoDB and `JWT_SECRET`. |
+| `SEED_ON_START` | `true` | Seeds an empty database at startup; never clears existing users. Set `false` to disable. |
 | `DEMO_MODE` | Enabled outside production | Set `false` to disable one-click demo login. |
+| `VITE_API_URL` | Unset | Client API origin. Set to the Render origin on Vercel; when unset, the client uses relative `/api` and the Vercel rewrite or local Vite proxy. |
+| `VITE_SOCKET_URL` | `VITE_API_URL` or current origin | Socket.io origin. Set to the Render origin on Vercel for direct realtime traffic. |
 
-With a reachable `MONGO_URI`, the database is persistent and existing users are preserved. In development, an empty database is seeded on startup when demo mode is enabled. You can also run `npm run seed` to populate an empty configured database. The seed command skips a database that already has users; without `MONGO_URI`, it validates the seed in a temporary memory database rather than persisting it. Uploaded files are stored locally in `server/uploads/`.
+With a reachable `MONGO_URI`, the database is persistent and existing users are preserved. An empty database is seeded on startup unless `SEED_ON_START=false`. You can also run `npm run seed` to populate an empty configured database. The seed command skips a database that already has users; without `MONGO_URI`, it validates the seed in a temporary memory database rather than persisting it. Uploaded files are stored locally in `server/uploads/`.
 
-**Keep `.env` private.** The example file contains no credentials, and `.gitignore` excludes `.env`, uploads, build output, and dependencies. Disable demo mode and set a strong `JWT_SECRET` for any non-demo deployment.
+**Keep `.env` private.** The example file contains no credentials, and `.gitignore` excludes `.env`, uploads, build output, and dependencies. For local development, leave `VITE_` values unset so Vite uses its proxy. Vite reads client variables from `client/.env.local` or Vercel's dashboard, not the root `.env`.
+
+## Deploying: Vercel + Render
+
+This repository is configured for **[Vercel](https://sharebite-anurag.vercel.app)** at `client/` and **[Render](https://sharebite-3zgy.onrender.com/api/health)** at `server/`. The production client should call Render directly. `client/vercel.json` also provides `/api`, `/uploads`, and `/seed-assets` proxy rewrites as a fallback when `VITE_API_URL` is unset, plus a single-page-app fallback for refreshed routes such as `/login` and `/discover`. With `VITE_API_URL` set, those API proxy rewrites are not used by the client. Socket.io uses the direct Render URL when `VITE_SOCKET_URL` is set.
+
+### 1. Render backend
+
+In the Render web service dashboard, use **branch `main`**, **Root Directory `server`**, **Build Command `npm install`**, and **Start Command `node src/index.js`**. Set these Environment variables:
+
+```text
+NODE_ENV=production
+MONGO_URI=<your MongoDB Atlas connection string>
+JWT_SECRET=<a long, random secret you generate>
+CLIENT_URL=https://sharebite-anurag.vercel.app,http://localhost:5173,http://127.0.0.1:5173
+SEED_ON_START=true
+DEMO_MODE=true
+```
+
+Render supplies `PORT`; the server binds to `0.0.0.0` on that port. `DEMO_MODE=true` keeps the one-click judges' accounts available; switch it to `false` after the demo. In MongoDB Atlas, add **`0.0.0.0/0`** under **Network Access** so Render can connect, then redeploy the Render service. Confirm its root URL and `/api/health` return JSON. An empty Atlas database receives the Jaipur demo seed once; restarts preserve existing users and orders. Production intentionally fails with a clear message if MongoDB is missing or unreachable rather than running an ephemeral in-memory database.
+
+### 2. Vercel frontend
+
+In the Vercel project dashboard, use **branch `main`**, **Root Directory `client`**, **Framework Preset `Vite`**, **Build Command `npm run build`**, and **Output Directory `dist`**. Set these Environment Variables for Production (and Preview if you use preview deployments):
+
+```text
+VITE_API_URL=https://sharebite-3zgy.onrender.com
+VITE_SOCKET_URL=https://sharebite-3zgy.onrender.com
+```
+
+Use the origin exactly as shown: no `/api` suffix and no trailing slash. **Redeploy Vercel after editing either `VITE_` variable**, because Vite embeds these values at build time. Then refresh `/discover`: it should load food cards rather than an HTML error. Refresh `/login` directly to confirm the SPA fallback. If you omit `VITE_API_URL`, the relative `/api` request goes through the Vercel rewrite in `client/vercel.json`; direct Render calls are the recommended demo configuration.
+
+### Production notes
+
+- Render's free service may sleep when idle; the first request after a quiet period can take longer. Open `/api/health` before presenting.
+- Render's free filesystem is ephemeral. MongoDB records persist in Atlas, but uploaded photos under `server/uploads/` do **not** survive a redeploy or restart. Bundled seed photos remain available. Use persistent object storage for uploads beyond the demo.
+- The Vercel and Render origins are different, so `CLIENT_URL` must include the exact Vercel domain for API calls and Socket.io connections.
+- The server's unknown `/api/*` routes return JSON 404 responses. If the browser sees HTML for an API request, check `VITE_API_URL`, the Vercel deployment, and the network response URL logged in the console.
 
 ## Project structure
 
@@ -115,7 +156,7 @@ Run these commands from the repository root:
 | `npm run seed` | Seeds an empty configured MongoDB, or validates a temporary memory seed. |
 | `npm run lint` | Runs ESLint across both workspaces. |
 | `npm run build` | Builds the client and checks the server entry point. |
-| `npm run test` | Runs the API, privacy, seed, startup, and lifecycle tests. |
+| `npm run test` | Runs the API, privacy, seed, startup, and lifecycle tests in an isolated in-memory database, ignoring any configured `MONGO_URI`. |
 | `node scripts/verify-browser.mjs --existing --offline-map` | Checks key screens at desktop and mobile widths; saves screenshots under `.cache/screenshots/`. |
 | `node scripts/verify-core-loop.mjs` | Exercises the full donor-to-NGO journey in Chrome or Edge. |
 
@@ -144,5 +185,6 @@ The API validates inputs and checks roles server-side. Password hashes are never
 - **A donation disappeared after restart:** memory mode is temporary. Set `MONGO_URI` for persistent data.
 - **Map tiles are unavailable:** the local Jaipur backdrop still displays listing markers. No map service account is needed.
 - **Browser scripts cannot launch:** install Chrome or Edge locally. The application itself works in other modern browsers.
+- **Live feed says the API is unavailable:** verify Render `/api/health`, then redeploy Vercel with `VITE_API_URL` set to the Render origin. The console logs the URL and status when the API returns non-JSON.
 
 For design decisions, see the [design brief](docs/design-brief.md). For data, privacy, and runtime contracts, see [architecture](docs/architecture.md). Review notes from the feature branches are in [docs/pull-requests](docs/pull-requests).
