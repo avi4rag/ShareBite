@@ -1,0 +1,125 @@
+/* ─── Orders page ─── */
+.order-card{display:grid;grid-template-columns:140px 1fr;overflow:hidden;transition:transform .25s,box-shadow .25s}
+.order-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-float)}
+.order-card.order-active{border-color:var(--primary)}
+.order-card-photo{position:relative;height:100%;min-height:140px}
+.order-card-photo img{width:100%;height:100%;object-fit:cover}
+.unread-pip{position:absolute;top:10px;right:10px;background:var(--clay);color:#fff;font-size:10px;font-weight:800;min-width:22px;height:22px;border-radius:50%;display:grid;place-items:center;padding:0 6px}
+.order-card-body{padding:20px;display:grid;gap:10px;align-content:start}
+.order-card-body h3{font-size:20px}
+.order-card-footer{margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+
+/* ─── Chat ─── */
+.chat-panel{display:grid;grid-template-rows:auto 1fr auto;height:420px;border:1px solid var(--border);border-radius:var(--radius-card);overflow:hidden;background:var(--background)}
+.chat-notice{padding:10px 16px;background:var(--muted);font-size:11px;color:var(--muted-foreground);display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border)}
+.chat-messages{overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);background:var(--card)}
+.chat-input input{flex:1;min-height:40px}
+.typing-indicator{display:flex;gap:4px;padding:8px 16px;align-self:flex-start}
+.typing-indicator span{width:6px;height:6px;background:var(--muted-foreground);border-radius:50%;animation:typing-dot .8s infinite alternate}
+.typing-indicator span:nth-child(2){animation-delay:.15s}
+.typing-indicator span:nth-child(3){animation-delay:.3s}
+@keyframes typing-dot{to{opacity:.3;transform:translateY(-3px)}}
+
+/* ─── Star rating ─── */
+.star-rating{display:flex;gap:4px}
+.star-rating .star{border:0;background:none;color:var(--border);padding:2px;cursor:pointer;transition:color .15s}
+.star-rating .star.active{color:var(--saffron)}
+.star-rating .star:hover{color:var(--saffron)}
+
+/* ─── Leaderboard ─── */
+.leaderboard-list{display:grid;gap:8px}
+.leaderboard-row{display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-card);transition:transform .2s}
+.leaderboard-row:hover{transform:translateX(4px)}
+.leaderboard-row.top-three{border-color:var(--primary);background:var(--muted)}
+.rank-badge{font-size:14px;font-weight:800;min-width:36px;text-align:center}
+.rank-gold{color:var(--saffron)}
+.rank-silver{color:var(--muted-foreground)}
+.rank-bronze{color:var(--clay)}
+.leader-name{flex:1;min-width:0}
+.leader-name strong{display:block;font-size:14px}
+.leader-meals{text-align:right}
+.leader-meals strong{font-family:'Fraunces',serif;font-size:22px;display:block;line-height:1.1}
+.star-row{display:flex;gap:2px;align-items:center;margin-top:4px}
+
+/* ─── Certificate ─── */
+.certificate-card{padding:28px;border:2px solid var(--primary);position:relative;overflow:hidden}
+.certificate-card::before{content:'';position:absolute;top:-40px;right:-40px;width:120px;height:120px;background:var(--saffron);opacity:.08;border-radius:50%}
+.cert-header{display:flex;align-items:center;gap:16px}
+.cert-seal{width:48px;height:48px;border-radius:50%;background:var(--saffron);color:#fff;display:grid;place-items:center;flex-shrink:0}
+.cert-stats{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.cert-actions{display:flex;gap:8px;margin-top:16px}
+
+/* ─── Dashboard ─── */
+.tier-track{display:flex;gap:8px}
+.tier-step{flex:1;text-align:center;padding:16px 8px;border-radius:var(--radius-card);border:1px solid var(--border);background:var(--background);transition:background .3s}
+.tier-step.achieved{background:var(--muted);border-color:var(--primary)}
+.tier-step.current-tier{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}
+.tier-icon{font-size:22px;display:block;margin-bottom:6px}
+.tier-current-badge{display:block;font-size:9px;font-weight:700;margin-top:4px;text-transform:uppercase;letter-spacing:.1em}
+.tier-next{text-align:center;padding-top:8px}
+.activity-row{display:flex;align-items:center;gap:14px;padding:12px;border-radius:var(--radius-card);border:1px solid var(--border);transition:background .2s}
+.activity-row:hover{background:var(--muted)}
+.activity-photo{width:48px;height:48px;border-radius:12px;overflow:hidden;flex-shrink:0}
+.activity-photo img{width:100%;height:100%;object-fit:cover}
+.stat-mini{text-align:center;padding:12px}
+.stat-mini strong{font-family:'Fraunces',serif;font-size:24px;display:block}
+.stat-mini span{font-size:11px}
+.demand-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-card)}
+
+/* ─── NGO directory ─── */
+.ngo-dir-card{padding:24px;transition:transform .25s,box-shadow .25s}
+.ngo-dir-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-float)}
+.ngo-dir-card h3{font-size:22px;margin:16px 0 10px}
+.ngo-meta{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;font-size:11px;color:var(--muted-foreground)}
+.ngo-meta span{display:flex;align-items:center;gap:5px}
+.ngo-card-footer{padding-top:16px;border-top:1px solid var(--border)}
+.review-item{padding:14px 0;border-bottom:1px solid var(--border)}
+.review-item:last-child{border-bottom:0}
+.input-icon-wrap{position:relative}
+.input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-foreground)}
+
+/* ─── Admin panel ─── */
+.admin-user-card{overflow:hidden;transition:transform .2s}
+.admin-user-card.banned{border-color:var(--danger);opacity:.8}
+.admin-user-header{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;transition:background .2s}
+.admin-user-header:hover{background:var(--muted)}
+.admin-user-detail{padding:0 20px 20px;border-top:1px solid var(--border);padding-top:16px}
+.admin-profile-info{font-size:13px;line-height:1.8}
+.admin-profile-info p{margin:0}
+.admin-actions{display:flex;gap:8px;flex-wrap:wrap}
+.admin-report-card{padding:20px}
+.admin-order-row{padding:14px 20px}
+
+/* ─── Back link ─── */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted-foreground);border:0;background:none;cursor:pointer;padding:0;margin-bottom:8px}
+.back-link:hover{color:var(--primary)}
+
+/* ─── Bell ─── */
+.bell-button{position:relative;display:flex;align-items:center;color:var(--foreground)}
+.bell-pip{position:absolute;top:-4px;right:-6px;background:var(--clay);color:#fff;font-size:9px;font-weight:800;min-width:16px;height:16px;border-radius:50%;display:grid;place-items:center;padding:0 4px}
+
+/* ─── Segmented (reused) ─── */
+.segmented{display:flex;gap:4px;background:var(--muted);padding:4px;border-radius:var(--radius-control)}
+
+/* ─── Section label ─── */
+.section-label{padding:16px 0 12px}
+
+/* ─── Responsive ─── */
+@media(max-width:900px){
+  .order-card{grid-template-columns:100px 1fr}
+  .chat-panel{height:350px}
+  .tier-track{flex-wrap:wrap}
+  .tier-step{min-width:70px}
+  .leaderboard-row{flex-wrap:wrap;gap:10px}
+  .leader-meals{flex-basis:100%;text-align:left}
+  .admin-user-header{flex-wrap:wrap}
+}
+@media(max-width:600px){
+  .order-card{grid-template-columns:1fr;grid-template-rows:120px 1fr}
+  .chat-panel{height:300px}
+  .cert-header{flex-wrap:wrap}
+  .cert-stats{flex-direction:column;align-items:flex-start}
+  .admin-actions{flex-direction:column}
+  .segmented{flex-wrap:wrap}
+}

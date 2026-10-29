@@ -1,16 +1,36 @@
-import { createApp } from './app.js';
-import { connectDatabase, closeDatabase } from './db.js';
-import { config } from './config.js';
-import { seedDatabase } from './seed.js';
-import { createServer } from 'node:http';
-import { attachSockets } from './socket.js';
-import { startExpiryJob } from './expiry.js';
-const mode = await connectDatabase();
-if (mode === 'memory' || config.demo) await seedDatabase();
-const server = createServer(createApp(mode));
-const io = attachSockets(server);
-const expiryJob = startExpiryJob();
-server.listen(config.port, () => console.log(`ShareBite API: http://localhost:${config.port}`));
-async function shutdown() { expiryJob.stop(); io.close(); server.close(); await closeDatabase(); process.exit(0); }
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+import { startRuntime, startupMessage } from './startup.js';
+
+try {
+  // Dynamic imports let configuration and missing-dependency errors use the same diagnostics.
+  const { createApp } = await import('./app.js');
+  const { connectDatabase, closeDatabase } = await import('./db.js');
+  const { config } = await import('./config.js');
+  const { seedDatabase } = await import('./seed.js');
+  const { createServer } = await import('node:http');
+  const { attachSockets } = await import('./socket.js');
+  const { startExpiryJob } = await import('./expiry.js');
+  const runtime = await startRuntime({
+    connect: connectDatabase, seed: seedDatabase,
+    createServer: mode => createServer(createApp(mode)),
+    attachSockets, startJob: startExpiryJob, closeDatabase,
+    port: config.port, demo: config.demo,
+  });
+  console.log(`[ShareBite] API ready: http://localhost:${config.port} (${runtime.mode} database)`);
+  console.log('[ShareBite] Open the app at http://localhost:5173. Health: /api/health');
+  let stopping = false;
+  async function stop() {
+    if (stopping) return;
+    stopping = true;
+    // Bound shutdown if an OS process or socket refuses to close.
+    const timeout = setTimeout(() => process.exit(1), 10000);
+    timeout.unref();
+    try { await runtime.shutdown(); process.exitCode = 0; }
+    catch (error) { console.error('[ShareBite] Shutdown failed:', error.message); process.exitCode = 1; }
+    finally { clearTimeout(timeout); }
+  }
+  process.on('SIGINT', stop);
+  process.on('SIGTERM', stop);
+} catch (error) {
+  console.error(startupMessage(error));
+  process.exitCode = 1;
+}

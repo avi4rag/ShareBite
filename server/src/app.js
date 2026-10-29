@@ -1,4 +1,7 @@
 import express from 'express';
+import mongoose from 'mongoose';
+import { readFileSync } from 'node:fs';
+const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 import cors from 'cors';
 import helmet from 'helmet';
 import { config } from './config.js';
@@ -19,7 +22,18 @@ export function createApp(databaseMode) {
   app.use(cors({ origin: config.origins }));
   app.use(express.json({ limit: '1mb' }));
   app.use('/seed-assets',express.static(path.join(root,'server','seed-assets')));
-  app.get('/api/health', (_req, res) => res.json({ status: 'ok', databaseMode, demo: config.demo }));
+  app.get('/', (_req, res) => res.json({
+    app: 'ShareBite', version, databaseMode,
+    message: 'Welcome to the ShareBite API. Open http://localhost:5173 for the app.',
+    links: { health: '/api/health' },
+  }));
+  app.get('/api/health', (_req, res) => {
+    const ready = mongoose.connection.readyState === 1;
+    res.status(ready ? 200 : 503).json({
+      status: ready ? 'ok' : 'unavailable', app: 'ShareBite', version,
+      databaseMode, databaseConnected: ready, demo: config.demo,
+    });
+  });
   app.use('/api', optionalAuth);
   app.use('/api/auth', authRouter);
   app.use('/api/listings', listingsRouter);

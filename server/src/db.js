@@ -18,4 +18,6 @@ export async function connectDatabase() {
   console.log('[ShareBite] Database: in-memory MongoDB. Demo data resets when the server stops.');
   return 'memory';
 }
-export async function closeDatabase() { await mongoose.disconnect(); await memory?.stop(); }
+export async function closeDatabase() {
+  try { await mongoose.disconnect(); } finally { await memory?.stop(); memory = undefined; }
+}
