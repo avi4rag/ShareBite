@@ -89,7 +89,7 @@ function CertificateCard({ cert }) {
 
       doc.setFontSize(9);
       doc.setTextColor(101, 115, 105);
-      doc.text('Verified at sharebite.example/certificates/' + cert.certId, 397, 510, { align: 'center' });
+      doc.text('Verified at ' + window.location.origin + '/certificates/' + cert.certId, 397, 510, { align: 'center' });
 
       doc.save(`ShareBite-Certificate-${cert.certId}.pdf`);
     },

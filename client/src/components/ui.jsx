@@ -17,7 +17,20 @@ export function Skeletons({ count = 3 }) { return <div className="grid-3" aria-l
 export function Field({ label, error, hint, children }) { return <label className="field"><span>{label}</span>{children}{hint && <small style={{ fontWeight: 400 }}>{hint}</small>}{error && <span className="field-error" role="alert">{error}</span>}</label>; }
 export function Avatar({ name = 'ShareBite', size = 40 }) { return <span className="avatar" style={{ width: size, height: size, fontSize: size / 3 }} aria-hidden="true">{name.split(' ').slice(0, 2).map(s => s[0]).join('')}</span>; }
 const fallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#e7ede4"/><circle cx="300" cy="210" r="145" fill="#fbf8f3"/><circle cx="300" cy="210" r="116" fill="#e8ad49"/><path d="M220 200q80-130 160 0q-70 100-160 0" fill="#244d3e"/><circle cx="265" cy="245" r="28" fill="#bc694e"/><circle cx="335" cy="245" r="28" fill="#bc694e"/><text x="300" y="375" text-anchor="middle" font-family="Georgia" fill="#244d3e" font-size="20">Good food. Another chance.</text></svg>');
-export function FoodImage({ src, alt, className, ...props }) { return <img src={src || fallback} alt={alt} className={cn('food-image', className)} loading="lazy" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallback; }} {...props}/>; }
+export function FoodImage({ src, alt, className, ...props }) {
+  const [resolved, setResolved] = useState(src || fallback);
+  useEffect(() => {
+    if (!src?.startsWith('/api/uploads/')) { setResolved(src || fallback); return; }
+    const controller = new AbortController();
+    let objectUrl;
+    fetch(src, { headers: { Authorization: `Bearer ${localStorage.getItem('sharebite-token') || ''}` }, signal: controller.signal })
+      .then(response => { if (!response.ok) throw new Error('Photo unavailable'); return response.blob(); })
+      .then(blob => { objectUrl = URL.createObjectURL(blob); setResolved(objectUrl); })
+      .catch(() => { if (!controller.signal.aborted) setResolved(fallback); });
+    return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [src]);
+  return <img src={resolved} alt={alt} className={cn('food-image', className)} loading="lazy" onError={e => { e.currentTarget.onerror = null; e.currentTarget.src = fallback; }} {...props}/>;
+}
 export function CountdownRing({ until, totalHours = 4 }) { const [now, setNow] = useState(Date.now()); useEffect(() => { const timer = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(timer); }, []); const seconds = Math.max(0, Math.floor((new Date(until).getTime() - now) / 1000)); const minutes = Math.floor(seconds / 60); const color = seconds < 1800 ? 'var(--danger)' : seconds < 7200 ? '#a36a16' : 'var(--primary)'; const text = seconds === 0 ? 'Window closed' : minutes >= 60 ? `${Math.floor(minutes / 60)}h ${minutes % 60}m left` : `${minutes}m ${seconds % 60}s left`; return <span className="countdown" style={{ color }}><svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" opacity=".18" strokeWidth="2.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" strokeWidth="2.5" strokeDasharray="56.55" strokeDashoffset={56.55 * (1 - Math.min(seconds / (totalHours * 3600), 1))} strokeLinecap="round"/></svg>{text}</span>; }
 const stages = [{ label: 'Available', icon: Utensils }, { label: 'Claimed', icon: PackageCheck }, { label: 'Picked Up', icon: Truck }, { label: 'Distributed', icon: Users }];
 export function StatusTimeline({ status, timeline = [] }) { const current = stages.findIndex(s => s.label === status); return <div><div className="timeline" aria-label={`Donation status: ${status}`}>{stages.map(({ label, icon: Icon }, i) => <div key={label} className={cn('timeline-step', i <= current && 'complete', i === current && 'current')}><div className="timeline-node">{i < current ? <Check size={16}/> : <Icon size={15}/>}</div><strong>{label}</strong>{timeline.find(t => t.status === label) && <time>{dateTime(timeline.find(t => t.status === label).at)}</time>}</div>)}</div>{current === -1 && <Badge tone="red">{status}</Badge>}</div>; }
