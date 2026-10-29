@@ -5,7 +5,7 @@ import { MessageSquare, Package, Truck, CheckCircle, Star, Camera, ArrowLeft, Se
 import { toast } from 'sonner';
 import { api, query } from '../lib/api';
 import { useAuth } from '../lib/auth';
-import { Page, QueryState, useAction, celebrate } from '../components/workspace';
+import { Page, QueryState, useAction, celebrate, ReportButton } from '../components/workspace';
 import { Button, Card, Field, Badge, FoodImage, StatusTimeline, ChatBubble, CountdownRing, Avatar } from '../components/ui';
 import { UploadField } from '../components/upload-field';
 import { dateTime } from '../lib/utils';
@@ -51,7 +51,7 @@ function ChatWindow({ orderId }) {
   const messages = useQuery(query(['chat', orderId], `/chat/${orderId}`, { staleTime: 5000 }));
 
   // Merge server messages with local optimistic messages
-  const allMessages = messages.data || localMessages;
+  const allMessages = localMessages;
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -65,14 +65,19 @@ function ChatWindow({ orderId }) {
         return [...prev, msg];
       });
     };
-    const handleTyping = ({ userId }) => {
-      if (userId !== user?._id) { setTyping(true); setTimeout(() => setTyping(false), 2000); }
+    const handleTyping = ({ orderId: eventOrderId, name, typing: isTyping }) => {
+      if (eventOrderId === orderId && name !== user?.name) {
+        setTyping(Boolean(isTyping));
+        if (isTyping) setTimeout(() => setTyping(false), 2000);
+      }
     };
-    socket.on(`order:${orderId}:message`, handleMessage);
-    socket.on(`order:${orderId}:typing`, handleTyping);
+    socket.emit('order:join', orderId);
+    socket.on('message', handleMessage);
+    socket.on('typing', handleTyping);
     return () => {
-      socket.off(`order:${orderId}:message`, handleMessage);
-      socket.off(`order:${orderId}:typing`, handleTyping);
+      socket.emit('order:leave', orderId);
+      socket.off('message', handleMessage);
+      socket.off('typing', handleTyping);
     };
   }, [socket, orderId, user]);
 
@@ -99,7 +104,7 @@ function ChatWindow({ orderId }) {
 
   function handleKeyChange(e) {
     setText(e.target.value);
-    socket?.emit('typing', { orderId, userId: user?._id });
+    socket?.emit('typing', { orderId, typing: Boolean(e.target.value) });
   }
 
   return (
@@ -109,9 +114,7 @@ function ChatWindow({ orderId }) {
       </div>
       <div className="chat-messages">
         {messages.isPending && <p className="muted" style={{ textAlign: 'center', padding: 24 }}>Loading messages…</p>}
-        {allMessages.map(msg => (
-          <ChatBubble key={msg._id} message={msg} mine={String(msg.sender?._id || msg.sender) === String(user?._id)} />
-        ))}
+        {allMessages.map(msg => <div key={msg._id} className="chat-message"><ChatBubble message={msg} mine={String(msg.sender?._id || msg.sender) === String(user?._id)} /><ReportButton type="message" id={msg._id} /></div>)}
         {typing && <div className="typing-indicator"><span /><span /><span /></div>}
         <div ref={endRef} />
       </div>
