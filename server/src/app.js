@@ -40,6 +40,7 @@ export function createApp(databaseMode) {
   app.use('/api/listings', listingsRouter);
   app.use('/api/orders', ordersRouter);
   app.use('/api/uploads', uploadsRouter);
+  app.use('/uploads', uploadsRouter);
   app.use('/api/chat', chatRouter);
   app.use('/api/notifications', notificationsRouter);
   app.use('/api/stats',statsRouter);
