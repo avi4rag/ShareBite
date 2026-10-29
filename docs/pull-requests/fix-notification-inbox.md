@@ -16,6 +16,6 @@ The panel is anchored below the bell on desktop and fixed within the mobile view
 
 ## Checklist
 - [x] App runs with no JavaScript console errors in the full browser walkthrough
-- [ ] Lint/build passes
+- [x] Lint/build passes
 - [x] Responsive checked (desktop and 390px layout)
 - [x] Seed data still works
