@@ -16,6 +16,6 @@ Documentation only. It names the current build chunk-size warning and the first-
 
 ## Checklist
 - [x] App runs with no JavaScript console errors in the full browser walkthrough
-- [ ] Lint/build passes
+- [x] Lint/build passes
 - [x] Responsive checked (mobile and desktop visual audit in prior PR)
 - [x] Seed data still works
