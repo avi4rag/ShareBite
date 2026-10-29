@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://sharebite-3zgy.onrender.com/api/:path*" },
+    { "source": "/uploads/:path*", "destination": "https://sharebite-3zgy.onrender.com/uploads/:path*" },
+    { "source": "/seed-assets/:path*", "destination": "https://sharebite-3zgy.onrender.com/seed-assets/:path*" },
+    { "source": "/socket.io/:path*", "destination": "https://sharebite-3zgy.onrender.com/socket.io/:path*" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
