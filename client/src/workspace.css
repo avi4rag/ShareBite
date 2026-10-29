@@ -129,7 +129,10 @@
   position: relative;
   background: var(--muted);
 }
-.map-shell > .leaflet-container { border-radius: inherit; }
+.map-shell > .leaflet-container {
+  border-radius: inherit;
+  background: #e9eee5 url('/jaipur-map.svg') center / cover no-repeat;
+}
 .map-caption {
   display: block;
   text-align: center;
