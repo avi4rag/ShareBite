@@ -8,7 +8,7 @@
     "start": "node src/index.js",
     "seed": "node src/seed-cli.js",
     "build": "node --check src/index.js",
-    "test": "node --test test/*.test.js"
+    "test": "node test/run.js"
   },
   "mongodbMemoryServer": {
     "version": "7.0.14"

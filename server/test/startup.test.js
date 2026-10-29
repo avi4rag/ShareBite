@@ -6,7 +6,7 @@ import { startRuntime, startupMessage } from '../src/startup.js';
 function dependencies(overrides = {}) {
   const calls = [];
   return {
-    calls, port: 0, demo: false,
+    calls, port: 0, seedOnStart: false,
     connect: async () => 'memory',
     seed: async () => { calls.push('seed'); },
     createServer: () => createServer((_req, res) => res.end('ready')),
@@ -25,11 +25,17 @@ test('successful startup seeds memory, listens, and closes resources exactly onc
   assert.equal(runtime.server.listening, false);
   assert.deepEqual(deps.calls, ['seed', 'job stopped', 'sockets closed', 'database closed']);
 });
-test('persistent mode without demo does not seed', async () => {
+test('persistent mode with seeding disabled does not seed', async () => {
   const deps = dependencies({ connect: async () => 'persistent' });
   const runtime = await startRuntime(deps);
   await runtime.shutdown();
   assert.equal(deps.calls.includes('seed'), false);
+});
+test('persistent mode with seeding enabled invokes the idempotent seed', async () => {
+  const deps = dependencies({ connect: async () => 'persistent', seedOnStart: true });
+  const runtime = await startRuntime(deps);
+  await runtime.shutdown();
+  assert.equal(deps.calls.filter(call => call === 'seed').length, 1);
 });
 test('database and seed failures close resources and retain the original cause', async () => {
   for (const stage of ['connect', 'seed']) {
