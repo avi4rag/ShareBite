@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { BarChart2, TrendingUp, Package, Heart, Award, ShieldCheck, Users, Leaf, MapPin, ArrowUpRight, Plus } from 'lucide-react';
 import { api, query } from '../lib/api';
-import { useAuth } from '../lib/auth';
 import { Page, QueryState, Go, useAction } from '../components/workspace';
 import { Button, Card, Badge, Field, StatCard, Reveal, Avatar, Skeletons, ErrorState } from '../components/ui';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

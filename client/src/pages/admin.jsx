@@ -4,7 +4,7 @@ import { ShieldCheck, ShieldAlert, ShieldX, Eye, Ban, UserCheck, FileText, Alert
 import { api, query, openPrivateFile } from '../lib/api';
 import { Page, QueryState, useAction } from '../components/workspace';
 import { Button, Card, Badge, Field, Avatar, Reveal, StatCard } from '../components/ui';
-import { dateTime, number } from '../lib/utils';
+import { dateTime } from '../lib/utils';
 
 const STATUS_TONE = { verified: 'green', pending: 'amber', rejected: 'red' };
 const STATUS_ICON = { verified: ShieldCheck, pending: ShieldAlert, rejected: ShieldX };
