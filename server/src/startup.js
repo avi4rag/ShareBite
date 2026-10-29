@@ -1,5 +1,5 @@
 // Keep lifecycle orchestration independent of MongoDB so failure paths can be tested.
-export async function startRuntime({ connect, seed, createServer, attachSockets, startJob, closeDatabase, port, demo }) {
+export async function startRuntime({ connect, seed, createServer, attachSockets, startJob, closeDatabase, port, seedOnStart }) {
   let server, io, job, closing;
   const shutdown = () => closing ||= (async () => {
     await job?.stop();
@@ -14,14 +14,14 @@ export async function startRuntime({ connect, seed, createServer, attachSockets,
   try {
     const mode = await connect();
     stage = 'demo seeding';
-    if (mode === 'memory' || demo) await seed();
+    if (mode === 'memory' || seedOnStart) await seed();
     stage = 'HTTP server setup';
     server = createServer(mode);
     io = attachSockets(server);
     stage = `listening on port ${port}`;
     await new Promise((resolve, reject) => {
       server.once('error', reject);
-      server.listen(port, () => { server.off('error', reject); resolve(); });
+      server.listen(port, '0.0.0.0', () => { server.off('error', reject); resolve(); });
     });
     stage = 'expiry scheduler';
     job = startJob();

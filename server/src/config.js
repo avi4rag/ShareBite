@@ -12,5 +12,7 @@ export const config = {
   mongoUri: process.env.MONGO_URI,
   jwtSecret: process.env.JWT_SECRET || randomBytes(48).toString('hex'),
   demo: process.env.DEMO_MODE === 'true' || (process.env.NODE_ENV !== 'production' && process.env.DEMO_MODE !== 'false'),
-  origins: [process.env.CLIENT_ORIGIN || 'http://localhost:5173', 'http://127.0.0.1:5173'],
+  seedOnStart: process.env.SEED_ON_START !== 'false',
+  production: process.env.NODE_ENV === 'production',
+  origins: [...new Set((process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || 'https://sharebite-anurag.vercel.app,http://localhost:5173,http://127.0.0.1:5173').split(',').map(origin => origin.trim().replace(/\/$/, '')).filter(Boolean))],
 };
