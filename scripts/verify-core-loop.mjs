@@ -68,6 +68,10 @@ try {
   await page.goto(orderUrl);
   await page.getByText('24 people fed').waitFor();
   console.log('Donor sees completed journey');
+  await page.getByRole('button', { name: /^Notifications/ }).click();
+  await page.getByRole('region', { name: 'Notifications' }).getByText('Your food has found its next table').first().waitFor();
+  await page.getByRole('button', { name: 'Mark all read' }).click();
+  console.log('Notification inbox opened and marked read');
   if (errors.length) throw new Error(errors.join('\n'));
   console.log('Core loop passed without browser errors');
 } finally {

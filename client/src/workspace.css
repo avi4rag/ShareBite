@@ -265,6 +265,20 @@
 /* ─── Notification bell ─── */
 .bell-button { position: relative; display: flex; align-items: center; color: var(--foreground); }
 .bell-pip { position: absolute; top: -4px; right: -6px; background: var(--clay); color: #fff; font-size: 9px; font-weight: 800; min-width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; padding: 0 4px; }
+.notification-wrap { position: relative; }
+.bell-button { background: transparent; border: 0; cursor: pointer; padding: 8px; border-radius: 12px; }
+.bell-button:hover, .bell-button:focus-visible { background: var(--surface, #f0eee8); outline: 2px solid var(--primary); outline-offset: 2px; }
+.notification-inbox { position: absolute; z-index: 1000; top: calc(100% + 16px); right: -50px; width: min(370px, calc(100vw - 24px)); max-height: min(520px, 70vh); overflow: auto; padding: 16px; border: 1px solid var(--border); border-radius: 18px; background: var(--card); box-shadow: 0 20px 60px #172c1d33; }
+.notification-head { gap: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+.notification-head button { border: 0; background: transparent; color: var(--primary); font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.notification-inbox > p { padding: 20px 4px 4px; font-size: 13px; }
+.notification-list { display: grid; }
+.notification-item { display: grid; gap: 4px; padding: 13px 8px; border-bottom: 1px solid var(--border); border-radius: 8px; color: var(--foreground); text-decoration: none; }
+.notification-item:hover, .notification-item:focus-visible { background: var(--surface, #f0eee8); outline: 2px solid var(--primary); }
+.notification-item.unread { border-left: 3px solid var(--saffron); padding-left: 12px; }
+.notification-item span { font-size: 12px; color: var(--muted-foreground, #657369); line-height: 1.5; }
+.notification-item small { color: var(--muted-foreground, #657369); font-size: 10px; }
+@media (max-width: 480px) { .notification-inbox { position: fixed; top: 66px; right: 12px; } }
 
 /* ─── Segmented control ─── */
 .segmented { display: flex; gap: 4px; background: var(--muted); padding: 4px; border-radius: var(--radius-control); }
