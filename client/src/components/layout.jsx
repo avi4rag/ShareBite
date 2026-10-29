@@ -1,7 +1,7 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, MapPin, Heart, LogOut, Home, UserRound, Settings, Trophy, Users, ShieldCheck, LayoutDashboard, Bell, Package } from 'lucide-react';
 import { Brand, ThemeToggle, Button, Badge } from './ui';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useAuth } from '../lib/auth';
 import { useQuery } from '@tanstack/react-query';
 import { query } from '../lib/api';

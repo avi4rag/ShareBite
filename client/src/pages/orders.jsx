@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { MessageSquare, Package, Truck, CheckCircle, Star, Camera, ArrowLeft, Send, ShieldAlert, AlertCircle, Users, Clock } from 'lucide-react';
 import { toast } from 'sonner';
-import { api, query, uploadFile } from '../lib/api';
+import { api, query } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import { Page, QueryState, useAction, celebrate } from '../components/workspace';
 import { Button, Card, Field, Badge, FoodImage, StatusTimeline, ChatBubble, CountdownRing, Avatar } from '../components/ui';
@@ -14,7 +14,6 @@ import { dateTime } from '../lib/utils';
 function OrderCard({ order }) {
   const isActive = !['Distributed', 'Expired', 'Cancelled'].includes(order.status);
   const listing = order.listing;
-  const other = order.donor?._id === order.ngo?._id ? order.donor : order.ngo;
   return (
     <Card className={`order-card ${isActive ? 'order-active' : ''}`}>
       <div className="order-card-photo">
@@ -213,7 +212,6 @@ export function OrderDetail() {
 
   const o = order.data;
   const isNgo = user?.role === 'ngo' || String(o.ngo?._id) === String(user?._id);
-  const isDonor = String(o.donor?._id) === String(user?._id);
   const listing = o.listing;
   const canPickup = isNgo && o.status === 'Claimed';
   const canProof = isNgo && o.status === 'Picked Up' && !showProof;
@@ -316,7 +314,6 @@ export function OrderDetail() {
 
 /* ─── Orders List Page ─── */
 export function Orders() {
-  const { user } = useAuth();
   const orders = useQuery(query('orders', '/orders', { refetchInterval: 30000 }));
   const active = orders.data?.filter(o => !['Distributed', 'Expired', 'Cancelled'].includes(o.status)) || [];
   const past = orders.data?.filter(o => ['Distributed', 'Expired', 'Cancelled'].includes(o.status)) || [];

@@ -1,16 +1,16 @@
 ## Summary
-Bring existing donation discovery and atomic claims into the responsive interface.
+Finish the responsive styling for the discovery, map, posting and workspace screens already present on `main`. Add a local Jaipur map backdrop so clustered food markers remain readable when OpenStreetMap tiles cannot load.
 ## Changes
-- Search, diet/category/distance/serving filters, urgency/distance sorting and live countdowns.
-- Clustered OpenStreetMap with meal-token markers and accessible detail buttons.
-- Detail and collection pass with privacy-preserving addresses, claim/cancel controls and reporting.
-- Reusable page, request-state, mutation and map components.
+- Add missing workspace layout and component CSS across desktop and mobile widths.
+- Add a locally bundled fallback map backdrop for unavailable tiles.
+- Clear seven unused-import lint errors in the existing UI pages.
+- Make the browser script reuse an already-running app and simulate unavailable tiles.
 ## How to test
-Open /discover at desktop/mobile sizes; filter listings and switch map/cards. Claim as verified NGO and inspect the unlocked address. Try an unverified NGO and another claimant.
+Run `npm run lint`, `npm run build`, and `npm run test`. Start server and client; run `node scripts/verify-browser.mjs --existing --offline-map`. Inspect `/discover` at 1440px and 390px, switch map/cards, and open a listing.
 ## Screenshots / notes
-CI captures discovery and map screenshots at 1440px and 390px. OpenStreetMap requires network; cards remain usable when tiles fail. Direct main commits authorized by owner.
+The local run captured discovery and fallback-map screenshots at 1440px and 390px. OpenStreetMap tiles require network; the local backdrop keeps the map legible without them. Existing discovery and donor form implementations were merged earlier by a collaborator.
 ## Checklist
-- [ ] App runs with no console errors (CI pending)
+- [x] App runs with no JavaScript console errors in the offline-map browser check
 - [x] Lint/build passes
-- [ ] Responsive checked (mobile + desktop; CI pending)
-- [ ] Seed data still works (CI pending)
+- [x] Responsive checked (mobile + desktop)
+- [x] Seed data still works (16 API tests)

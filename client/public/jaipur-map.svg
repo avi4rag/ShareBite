@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720">
+  <rect width="1200" height="720" fill="#e9eee5"/>
+  <g fill="#d6e4d5" opacity=".9"><path d="M0 0h273l57 92-43 144-96 40L0 230z"/><path d="M963 0h237v213l-115 48-143-102z"/><path d="M29 486l227-65 108 112-46 187H0V551z"/><path d="M890 522l154-92 156 69v221H939z"/><path d="M553 80l129-37 63 101-48 100-140-18z"/></g>
+  <g fill="none" stroke="#fdfbf5" stroke-linecap="round" stroke-linejoin="round"><path stroke-width="32" d="M-20 112 272 215 483 133 784 309 1220 337M-30 572 282 494 488 540 790 451 1230 546M147-20 317 222 370 406 538 740M764-30 691 226 866 425 765 750"/><path stroke-width="19" d="M34 326 251 322 455 266 644 384 881 346 1205 166M-8 695 219 612 503 657 697 522 1022 460 1215 486M405-30 489 182 462 335 625 502 589 741M1018-15 892 166 1041 283 978 601 1054 730"/></g>
+  <g fill="none" stroke="#cfdbcf" stroke-width="2" opacity=".75"><path d="M0 30 1200 460M0 206 1200 641M0 379 902 720M142 0 634 720M988 0 405 720M1108 0 774 720"/></g>
+  <g font-family="Arial,sans-serif" fill="#81978a" font-size="18" font-weight="700" letter-spacing="2"><text x="490" y="371">JAIPUR</text><text x="115" y="294">VAISHALI NAGAR</text><text x="789" y="231">RAJA PARK</text><text x="471" y="616">MANSAROVAR</text><text x="666" y="111">BANI PARK</text></g>
+  <g fill="#bad1bd"><circle cx="559" cy="358" r="5"/><circle cx="876" cy="236" r="4"/><circle cx="227" cy="290" r="4"/></g>
+</svg>
