@@ -3,8 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { BarChart2, TrendingUp, Package, Heart, Award, ShieldCheck, Users, Leaf, MapPin, ArrowUpRight, Plus } from 'lucide-react';
 import { api, query } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import { Page, QueryState, Go, useAction } from '../components/workspace';
-import { Button, Card, Badge, Field, StatCard, Reveal, Avatar, Skeletons, ErrorState } from '../components/ui';
+import { Button, Card, Badge, Field, StatCard, Reveal, Avatar, Skeletons, ErrorState, FoodImage } from '../components/ui';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { number, tierFor } from '../lib/utils';
 
@@ -106,7 +107,7 @@ function DashboardBody({ stats, myOrders }) {
               <Reveal key={order._id}>
                 <div className="activity-row">
                   <div className="activity-photo">
-                    <img src={order.listing?.photos?.[0] || ''} alt={order.listing?.foodName} onError={e => { e.currentTarget.style.display = 'none'; }} />
+                    <FoodImage src={order.listing?.photos?.[0]} alt={order.listing?.foodName} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <strong>{order.listing?.foodName}</strong>
@@ -171,6 +172,7 @@ function DemandForm() {
 export function DonorDashboard() {
   const stats = useQuery(query('my-stats', '/stats?mine=true'));
   const orders = useQuery(query('orders', '/orders'));
+  const demands = useQuery(query('demands', '/demands'));
 
   return (
     <Page
@@ -180,7 +182,7 @@ export function DonorDashboard() {
       action={<Go to="/donate">Share food</Go>}
     >
       <QueryState query={stats}>
-        {data => <DashboardBody stats={data} myOrders={orders.data || []} />}
+        {data => <div className="stack"><DashboardBody stats={data} myOrders={orders.data || []} /><Card className="panel stack"><span className="eyebrow"><Heart size={13} /> What neighbours need</span><h2>Share with a purpose</h2><p className="muted">Verified community teams have told us what would help most. Your next donation could answer a request.</p><QueryState query={demands} empty="No open requests right now. A fresh donation is still welcome.">{items => items.map(item => <div key={item._id} className="demand-row"><div><strong>{item.title}</strong><p className="muted">{item.description}</p><small>{item.ngo?.name} · {item.meals} meals · {item.neighbourhood} · by {new Date(item.neededBy).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</small></div><Button asChild size="sm"><Link to="/donate">Share food</Link></Button></div>)}</QueryState></Card></div>}
       </QueryState>
     </Page>
   );
@@ -188,9 +190,11 @@ export function DonorDashboard() {
 
 /* ─── NGO Dashboard ─── */
 export function NgoDashboard() {
+  const { user } = useAuth();
   const stats = useQuery(query('my-stats', '/stats?mine=true'));
   const orders = useQuery(query('orders', '/orders'));
   const demands = useQuery(query('demands', '/demands'));
+  const fulfil = useAction(id => api(`/demands/${id}`, { method: 'PATCH' }));
 
   return (
     <Page
@@ -218,7 +222,7 @@ export function NgoDashboard() {
                           <br />
                           <small className="muted">{item.meals} meals · {item.neighbourhood} · by {new Date(item.neededBy).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}</small>
                         </div>
-                        <Badge tone={item.status === 'fulfilled' ? 'green' : 'amber'}>{item.status}</Badge>
+                        {item.ngo?._id === user?._id ? <Button size="sm" variant="secondary" disabled={fulfil.isPending} onClick={() => fulfil.mutate(item._id)}>Mark fulfilled</Button> : <Badge tone="amber">Open</Badge>}
                       </div>
                     ))}
                   </div>
