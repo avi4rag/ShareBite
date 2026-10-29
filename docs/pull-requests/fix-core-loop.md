@@ -18,6 +18,6 @@ The browser walkthrough used local Chrome and the automatic in-memory Jaipur see
 
 ## Checklist
 - [x] App runs with no JavaScript console errors in the full browser walkthrough
-- [ ] Lint/build passes
+- [x] Lint/build passes
 - [x] Responsive checked (discovery/map at 390px and 1440px in preceding PR)
 - [x] Seed data still works (API test suite)
