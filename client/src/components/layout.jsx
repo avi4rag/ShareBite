@@ -1,22 +1,29 @@
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowUpRight, MapPin, Heart, LogOut, Home, UserRound, Settings, Trophy, Users, ShieldCheck, LayoutDashboard, Bell, Package } from 'lucide-react';
 import { Brand, ThemeToggle, Button, Badge } from './ui';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useQuery } from '@tanstack/react-query';
-import { query } from '../lib/api';
+import { api, query, queryClient } from '../lib/api';
 
 function NotificationBell() {
   const { user } = useAuth();
+  const [open, setOpen] = useState(false);
   const notifications = useQuery(query('notifications', '/notifications', { enabled: !!user, refetchInterval: 30000 }));
   const unread = (notifications.data || []).filter(n => !n.read).length;
+  useEffect(() => { if (!open) return; const close = event => { if (event.key === 'Escape') setOpen(false); }; window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close); }, [open]);
+  async function read(item) {
+    if (!item.read) { await api(`/notifications/${item._id}/read`, { method: 'PATCH' }); await queryClient.invalidateQueries({ queryKey: ['notifications'] }); }
+    setOpen(false);
+  }
+  async function readAll() { await api('/notifications/read-all', { method: 'PATCH' }); await queryClient.invalidateQueries({ queryKey: ['notifications'] }); }
 
   if (!user) return null;
   return (
-    <NavLink to="/orders" className="bell-button" aria-label={`Notifications${unread ? ` (${unread} unread)` : ''}`}>
-      <Bell size={17} />
-      {unread > 0 && <span className="bell-pip">{unread > 9 ? '9+' : unread}</span>}
-    </NavLink>
+    <div className="notification-wrap">
+      <button className="bell-button" type="button" aria-label={`Notifications${unread ? ` (${unread} unread)` : ''}`} aria-expanded={open} aria-controls="notification-inbox" onClick={() => setOpen(!open)}><Bell size={17} />{unread > 0 && <span className="bell-pip">{unread > 9 ? '9+' : unread}</span>}</button>
+      {open && <div id="notification-inbox" className="notification-inbox" role="region" aria-label="Notifications"><div className="between notification-head"><strong>What’s happening</strong>{unread > 0 && <button type="button" onClick={readAll}>Mark all read</button>}</div>{notifications.isPending ? <p className="muted">Loading your updates…</p> : notifications.error ? <p role="alert">Could not load updates. Please try again.</p> : !notifications.data?.length ? <p className="muted">You’re all caught up. Good things are on the way.</p> : <div className="notification-list">{notifications.data.map(item => <Link key={item._id} className={`notification-item ${item.read ? '' : 'unread'}`} to={item.link || '/orders'} onClick={() => read(item)}><strong>{item.title}</strong><span>{item.body}</span><small>{new Date(item.createdAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</small></Link>)}</div>}</div>}
+    </div>
   );
 }
 
