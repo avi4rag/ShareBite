@@ -47,7 +47,7 @@ test('database and seed failures close resources and retain the original cause',
 });
 test('a real port collision rejects cleanly instead of crashing with an unhandled event', async () => {
   const occupied = createServer();
-  await new Promise(resolve => occupied.listen(0, resolve));
+  await new Promise(resolve => occupied.listen(0, '0.0.0.0', resolve));
   try {
     const deps = dependencies({ port: occupied.address().port });
     await assert.rejects(startRuntime(deps), error => {
