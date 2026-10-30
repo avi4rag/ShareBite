@@ -56,7 +56,11 @@ try {
   if (unknown.response.status !== 404 || !unknown.data.message) throw new Error('Unknown API route did not return JSON 404.');
   const cors = await fetch(`${base}/api/health`, { headers: { Origin: 'https://sharebite-anurag.vercel.app' } });
   if (cors.headers.get('access-control-allow-origin') !== 'https://sharebite-anurag.vercel.app') throw new Error('Production CORS origin is not allowed.');
-  console.log('Production API, seed, logins, JSON 404, and Vercel CORS passed against isolated MongoDB.');
+  const preflight = await fetch(`${base}/api/listings`, { method: 'OPTIONS', headers: { Origin: 'https://sharebite-anurag.vercel.app', 'Access-Control-Request-Method': 'POST', 'Access-Control-Request-Headers': 'authorization,content-type' } });
+  if (preflight.status !== 204 || !preflight.headers.get('access-control-allow-headers')?.toLowerCase().includes('authorization')) throw new Error('Production CORS preflight did not allow authenticated writes.');
+  const image = await fetch(`${base}/seed-assets/food-01.jpg`, { headers: { Origin: 'https://sharebite-anurag.vercel.app' } });
+  if (!image.ok || !image.headers.get('content-type')?.startsWith('image/') || image.headers.get('cross-origin-resource-policy') !== 'cross-origin') throw new Error('Seed images are not available cross-origin.');
+  console.log('Production API, seed, logins, JSON 404, CORS preflight, and food images passed against isolated MongoDB.');
 } finally {
   child.kill('SIGTERM');
   await new Promise(resolve => { if (child.exitCode !== null) resolve(); else child.once('exit', resolve); });
