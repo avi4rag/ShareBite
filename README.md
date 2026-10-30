@@ -157,6 +157,7 @@ Run these commands from the repository root:
 | `npm run lint` | Runs ESLint across both workspaces. |
 | `npm run build` | Builds the client and checks the server entry point. |
 | `npm run test` | Runs the API, privacy, seed, startup, and lifecycle tests in an isolated in-memory database, ignoring any configured `MONGO_URI`. |
+| `node scripts/verify-production.mjs` | Starts the real production server against a temporary MongoDB and checks JSON routes, seeding, demo logins, CORS, and JSON 404s without touching `.env`'s database. |
 | `node scripts/verify-browser.mjs --existing --offline-map` | Checks key screens at desktop and mobile widths; saves screenshots under `.cache/screenshots/`. |
 | `node scripts/verify-core-loop.mjs` | Exercises the full donor-to-NGO journey in Chrome or Edge. |
 
