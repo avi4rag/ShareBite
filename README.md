@@ -6,7 +6,7 @@ ShareBite helps Jaipur kitchens share fresh surplus food with verified community
 
 Built as a hackathon-ready full-stack demo, ShareBite runs with one command and comes to life with realistic Jaipur data.
 
-**Live app:** [sharebite-anurag.vercel.app](https://sharebite-anurag.vercel.app) · **API health:** [sharebite-3zgy.onrender.com/api/health](https://sharebite-3zgy.onrender.com/api/health)
+**Live app:** [sharebite-anurag.vercel.app](https://sharebite-anurag.vercel.app)
 
 **[Quick start](#quick-start) · [Three-minute demo](#three-minute-demo) · [Features](#what-you-can-do) · [Configuration](#configuration) · [Development](#development-and-verification)**
 
@@ -119,11 +119,6 @@ Render supplies `PORT`; the server binds to `0.0.0.0` on that port. `DEMO_MODE=t
 ### 2. Vercel frontend
 
 In the Vercel project dashboard, use **branch `main`**, **Root Directory `client`**, **Framework Preset `Vite`**, **Build Command `npm run build`**, and **Output Directory `dist`**. Set these Environment Variables for Production (and Preview if you use preview deployments):
-
-```text
-VITE_API_URL=https://sharebite-3zgy.onrender.com
-VITE_SOCKET_URL=https://sharebite-3zgy.onrender.com
-```
 
 Use the origin exactly as shown: no `/api` suffix and no trailing slash. **Redeploy Vercel after editing either `VITE_` variable**, because Vite embeds these values at build time. Then refresh `/discover`: it should load food cards rather than an HTML error. Refresh `/login` directly to confirm the SPA fallback. If you omit `VITE_API_URL`, the relative `/api` request goes through the Vercel rewrite in `client/vercel.json`; direct Render calls are the recommended demo configuration.
 
