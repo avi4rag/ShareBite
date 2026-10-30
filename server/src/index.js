@@ -13,7 +13,7 @@ try {
     connect: connectDatabase, seed: seedDatabase,
     createServer: mode => createServer(createApp(mode)),
     attachSockets, startJob: startExpiryJob, closeDatabase,
-    port: config.port, demo: config.demo,
+    port: config.port, seedOnStart: config.seedOnStart,
   });
   console.log(`[ShareBite] API ready: http://localhost:${config.port} (${runtime.mode} database)`);
   console.log('[ShareBite] Open the app at http://localhost:5173. Health: /api/health');

@@ -4,6 +4,7 @@ import { Navigate,useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import { toast } from 'sonner';
 import { api,queryClient,query } from './api';
+import { socketOrigin } from './urls';
 import { Skeletons,EmptyState } from '../components/ui';
 const AuthContext=createContext(null);
 export function AuthProvider({children}) {
@@ -12,7 +13,7 @@ export function AuthProvider({children}) {
   const session=useQuery(query(['session',token],'/auth/me',{enabled:Boolean(token),retry:false,staleTime:60000}));
   useEffect(()=>{if(session.error?.status===401){localStorage.removeItem('sharebite-token');setToken(null);}},[session.error]);
   useEffect(()=>{
-    const connection=io({auth:{token},reconnectionAttempts:5});setSocket(connection);
+    const connection=io(socketOrigin||undefined,{auth:{token},reconnectionAttempts:5});setSocket(connection);
     const refresh=()=>queryClient.invalidateQueries({predicate:q=>!['session'].includes(q.queryKey[0])});
     connection.on('listings:changed',refresh);connection.on('orders:changed',refresh);connection.on('impact:changed',refresh);connection.on('messages:read',()=>queryClient.invalidateQueries({queryKey:['orders']}));
     connection.on('notification',item=>{refresh();toast(item.title,{description:item.body});if(item.kind==='verification')queryClient.invalidateQueries({queryKey:['session']});});

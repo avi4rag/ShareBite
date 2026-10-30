@@ -5,7 +5,7 @@ import { participantOrder } from './routes/orders.js';
 import { sendMessage } from './routes/chat.js';
 import { setSocketServer } from './events.js';
 export function attachSockets(httpServer) {
-  const io = new Server(httpServer,{ cors:{ origin:config.origins },maxHttpBufferSize:16384 });
+  const io = new Server(httpServer,{ cors:{ origin:config.origins, credentials:true, methods:['GET','POST'], allowedHeaders:['Authorization','Content-Type'] },maxHttpBufferSize:16384 });
   setSocketServer(io);
   io.use(async (socket,next) => { try { if (socket.handshake.auth.token) socket.data.user = await userFromToken(socket.handshake.auth.token); next(); } catch { next(new Error('Please sign in again.')); } });
   io.on('connection',socket => {

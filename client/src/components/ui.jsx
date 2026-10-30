@@ -3,6 +3,7 @@ import { motion as Motion, useReducedMotion } from 'framer-motion';
 import { Check, HeartHandshake, AlertCircle, Leaf, Moon, Sun, Utensils, PackageCheck, Truck, Users } from 'lucide-react';
 import { Button } from './ui/button';
 import { cn, number, dateTime } from '../lib/utils';
+import { assetUrl } from '../lib/urls';
 export { Button };
 export const Card = ({ children, className, ...props }) => <div className={cn('card', className)} {...props}>{children}</div>;
 export const Badge = ({ children, tone = '', ...props }) => <span className={cn('badge', tone && `badge-${tone}`)} {...props}>{children}</span>;
@@ -18,12 +19,12 @@ export function Field({ label, error, hint, children }) { return <label classNam
 export function Avatar({ name = 'ShareBite', size = 40 }) { return <span className="avatar" style={{ width: size, height: size, fontSize: size / 3 }} aria-hidden="true">{name.split(' ').slice(0, 2).map(s => s[0]).join('')}</span>; }
 const fallback = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400"><rect width="600" height="400" fill="#e7ede4"/><circle cx="300" cy="210" r="145" fill="#fbf8f3"/><circle cx="300" cy="210" r="116" fill="#e8ad49"/><path d="M220 200q80-130 160 0q-70 100-160 0" fill="#244d3e"/><circle cx="265" cy="245" r="28" fill="#bc694e"/><circle cx="335" cy="245" r="28" fill="#bc694e"/><text x="300" y="375" text-anchor="middle" font-family="Georgia" fill="#244d3e" font-size="20">Good food. Another chance.</text></svg>');
 export function FoodImage({ src, alt, className, ...props }) {
-  const [resolved, setResolved] = useState(src || fallback);
+  const [resolved, setResolved] = useState(assetUrl(src) || fallback);
   useEffect(() => {
-    if (!src?.startsWith('/api/uploads/')) { setResolved(src || fallback); return; }
+    if (!src?.startsWith('/api/uploads/')) { setResolved(assetUrl(src) || fallback); return; }
     const controller = new AbortController();
     let objectUrl;
-    fetch(src, { headers: { Authorization: `Bearer ${localStorage.getItem('sharebite-token') || ''}` }, signal: controller.signal })
+    fetch(assetUrl(src), { headers: { Authorization: `Bearer ${localStorage.getItem('sharebite-token') || ''}` }, signal: controller.signal })
       .then(response => { if (!response.ok) throw new Error('Photo unavailable'); return response.blob(); })
       .then(blob => { objectUrl = URL.createObjectURL(blob); setResolved(objectUrl); })
       .catch(() => { if (!controller.signal.aborted) setResolved(fallback); });

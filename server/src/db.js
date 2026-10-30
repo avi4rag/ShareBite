@@ -35,12 +35,20 @@ function clearStaleLocks() {
 let memory;
 
 export async function connectDatabase() {
+  if (config.production && !config.mongoUri) {
+    console.error('[ShareBite] PRODUCTION DATABASE MISSING: set MONGO_URI to a persistent MongoDB connection. In-memory MongoDB is only for local development.');
+    throw new Error('MONGO_URI is required in production.');
+  }
   if (config.mongoUri) {
     try {
       await mongoose.connect(config.mongoUri, { serverSelectionTimeoutMS: 5000 });
       console.log('[ShareBite] Database: configured MongoDB (persistent).');
       return 'persistent';
-    } catch {
+    } catch (error) {
+      if (config.production) {
+        console.error('[ShareBite] PRODUCTION DATABASE UNREACHABLE: check MongoDB Atlas access and MONGO_URI. In-memory fallback is disabled in production.');
+        throw error;
+      }
       console.warn(
         '[ShareBite] Configured MongoDB is unreachable. ' +
         'Falling back to a seeded in-memory database.'

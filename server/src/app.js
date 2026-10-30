@@ -18,8 +18,9 @@ import { ngosRouter, usersRouter, demandsRouter, reportsRouter } from './routes/
 import { adminRouter } from './routes/admin.js';
 export function createApp(databaseMode) {
   const app = express();
-  app.use(helmet({ crossOriginResourcePolicy: { policy: 'same-site' } }));
-  app.use(cors({ origin: config.origins }));
+  app.set('trust proxy', 1);
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
+  app.use(cors({ origin: config.origins, credentials: true, methods: ['GET','POST','PATCH','OPTIONS'], allowedHeaders: ['Content-Type','Authorization'] }));
   app.use(express.json({ limit: '1mb' }));
   app.use('/seed-assets',express.static(path.join(root,'server','seed-assets')));
   app.get('/', (_req, res) => res.json({
@@ -39,6 +40,7 @@ export function createApp(databaseMode) {
   app.use('/api/listings', listingsRouter);
   app.use('/api/orders', ordersRouter);
   app.use('/api/uploads', uploadsRouter);
+  app.use('/uploads', uploadsRouter);
   app.use('/api/chat', chatRouter);
   app.use('/api/notifications', notificationsRouter);
   app.use('/api/stats',statsRouter);
