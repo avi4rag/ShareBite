@@ -6,6 +6,8 @@ ShareBite helps Jaipur kitchens share fresh surplus food with verified community
 
 Built as a hackathon-ready full-stack demo, ShareBite runs with one command and comes to life with realistic Jaipur data.
 
+**Live app:** [sharebite-anurag.vercel.app](https://sharebite-anurag.vercel.app) · **API health:** [sharebite-3zgy.onrender.com/api/health](https://sharebite-3zgy.onrender.com/api/health)
+
 **[Quick start](#quick-start) · [Three-minute demo](#three-minute-demo) · [Features](#what-you-can-do) · [Configuration](#configuration) · [Development](#development-and-verification)**
 
 ## Quick start
@@ -95,7 +97,9 @@ With a reachable `MONGO_URI`, the database is persistent and existing users are 
 
 ## Deploying: Vercel + Render
 
-This repository is configured for **[Vercel](https://sharebite-anurag.vercel.app)** at `client/` and **[Render](https://sharebite-3zgy.onrender.com/api/health)** at `server/`. The production client should call Render directly. `client/vercel.json` also provides `/api`, `/uploads`, and `/seed-assets` proxy rewrites as a fallback when `VITE_API_URL` is unset, plus a single-page-app fallback for refreshed routes such as `/login` and `/discover`. With `VITE_API_URL` set, those API proxy rewrites are not used by the client. Socket.io uses the direct Render URL when `VITE_SOCKET_URL` is set.
+The deployed frontend runs on **Vercel** from `client/`; the API runs on **Render** from `server/`. The client calls Render directly when `VITE_API_URL` is set. Otherwise, `client/vercel.json` proxies `/api`, `/uploads`, and `/seed-assets` to Render. It also routes refreshed pages such as `/login` and `/discover` back to the React app. Set `VITE_SOCKET_URL` to Render for direct realtime connections.
+
+> **Live route check, 30 October 2026 (IST):** Vercel `/api/listings` returned **200 JSON**, a direct refresh of Vercel `/login` returned **200 HTML**, and Render `/api/health` returned **200 JSON**. This confirms the API proxy and SPA fallback are serving the deployed site.
 
 ### 1. Render backend
 
